@@ -5,7 +5,6 @@
 #include <Pulsar/AssetManager.h>
 #include <Pulsar/Assets/StaticMesh.h>
 #include <Pulsar/Rendering/LineRenderObject.h>
-#include <Pulsar/Rendering/ShaderPass.h>
 #include <PulsarEd/Windows/EditorWindowManager.h>
 #include <PulsarEd/Editors/CommonPanel/SceneWindow.h>
 
