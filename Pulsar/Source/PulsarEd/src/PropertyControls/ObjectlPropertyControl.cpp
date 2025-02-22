@@ -18,6 +18,7 @@ namespace pulsared
     bool ObjectPropertyControl::OnDrawImGui(const string& name, Type* type, Object* prop)
     {
         bool isChanged = false;
+
         auto objectPtr = dynamic_cast<BoxingObjectPtrBase*>(prop);
         auto rcobjPtr = dynamic_cast<BoxingRCPtrBase*>(prop);
 
@@ -25,6 +26,7 @@ namespace pulsared
         {
             throw EngineException();
         }
+
         ObjectHandle handle;
         if (objectPtr)
         {

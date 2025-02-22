@@ -17,6 +17,7 @@ namespace gfx
     {
         Vertex = 1,
         Fragment = 1 << 1,
+        Compute = 1 << 2,
         VertexFragment = Vertex | Fragment,
     };
     inline const char* to_string(GFXShaderStageFlags stage)

@@ -25,6 +25,7 @@ namespace pulsar
     public:
         SPtr<rendering::RenderObject> CreateRenderObject() override;
     public:
+        void GetDependencies(array_list<ObjectHandle>& out) override;
         List_sp<RCPtr<Material>> GetMaterials() const { return this->m_materials; }
 
         void PostEditChange(FieldInfo* info) override;

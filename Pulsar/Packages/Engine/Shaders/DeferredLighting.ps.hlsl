@@ -38,5 +38,6 @@ float4 main() : SV_TARGET
 {
     MaterialAttributes attr;
 
+
     return LightingPass(attr);
 }

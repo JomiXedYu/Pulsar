@@ -4,5 +4,6 @@
 	"DepthWriteEnable": true,
 	"DepthCompareOp": "Less",
 	"StencilTestEnable": false,
+	"RenderingType": "OpaqueForward",
 	"Topology": 0
 }

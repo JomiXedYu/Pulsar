@@ -7,7 +7,6 @@
 #include <Pulsar/Assets/Texture.h>
 #include <Pulsar/IGPUResource.h>
 #include <Pulsar/ObjectBase.h>
-#include <Pulsar/Rendering/ShaderPass.h>
 #include <Pulsar/Rendering/Types.h>
 #include <functional>
 #include <gfx/GFXApi.h>

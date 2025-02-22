@@ -193,11 +193,11 @@ namespace pulsar
         m_isReady = b;
         if (b)
         {
-            RuntimeObjectManager::NotifyDependObjects(GetObjectHandle(), DependencyObjectState::Reload);
+            RuntimeObjectManager::NotifyDependencySource(GetObjectHandle(), DependencyObjectState::Reload);
         }
         else
         {
-            RuntimeObjectManager::NotifyDependObjects(GetObjectHandle(), DependencyObjectState::Unload);
+            RuntimeObjectManager::NotifyDependencySource(GetObjectHandle(), DependencyObjectState::Unload);
         }
     }
     void Shader::Initialize()
@@ -228,6 +228,7 @@ namespace pulsar
         SetReady(true);
 
         auto config = GetConfig();
+        m_propertyInfo.clear();
 
         if (config->ConstantProperties)
         {

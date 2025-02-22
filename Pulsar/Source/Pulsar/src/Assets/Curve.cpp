@@ -15,6 +15,15 @@ namespace pulsar
         auto keyA = Keys->at(0);
         auto keyB = Keys->at(1);
 
+        if (InTime < keyA.Time)
+        {
+            return keyA.Value;
+        }
+        if (InTime > keyB.Time)
+        {
+            return keyB.Value;
+        }
+
         auto dt = keyB.Time - keyA.Time;
         auto t = (InTime - keyA.Time) / dt;
         return Lerp(keyA.Value, keyB.Value, t);

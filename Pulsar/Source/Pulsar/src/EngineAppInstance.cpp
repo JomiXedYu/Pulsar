@@ -72,7 +72,8 @@ namespace pulsar
                 for (auto& [state, batch] : batches)
                 {
                     auto shaderPass = batch.Material->GetGfxShaderPass();
-                    if (batch.Material->GetShader()->GetConfig()->RenderingType == ShaderPassRenderingType::PostProcessing)
+                    auto renderingType = batch.Material->GetShader()->GetConfig()->RenderingType;
+                    if (renderingType != ShaderPassRenderingType::OpaqueForward && renderingType != ShaderPassRenderingType::OpaqueDeferred)
                     {
                         continue;
                     }
@@ -144,6 +145,9 @@ namespace pulsar
 
                 cmdBuffer.CmdEndFrameBuffer();
                 cmdBuffer.SetFrameBuffer(nullptr);
+
+                // deferred lighting pass
+
 
                 // post processing
                 RCPtr<RenderTexture> lastPPRt;

@@ -36,6 +36,7 @@ namespace pulsar
         virtual bool CreateGPUResource() override;
         virtual void DestroyGPUResource() override;
         virtual bool IsCreatedGPUResource() const override;
+        void GetDependencies(array_list<ObjectHandle>& out) override;
 
     protected:
         void OnDependencyMessage(ObjectHandle inDependency, DependencyObjectState msg) override;

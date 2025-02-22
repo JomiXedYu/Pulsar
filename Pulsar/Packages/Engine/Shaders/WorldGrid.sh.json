@@ -5,6 +5,6 @@
 	"DepthWriteEnable": true,
 	"DepthCompareOp": "Less",
 	"StencilTestEnable": false,
-	"RenderingType": "OpaqueDeferred",
+	"RenderingType": "OpaqueForward",
 	"Properties": []
 }

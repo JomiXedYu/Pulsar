@@ -5,7 +5,7 @@
   "DepthWriteEnable": true,
   "DepthCompareOp": "Less",
   "StencilTestEnable": false,
-  "RenderingType": "OpaqueDeferred",
+	"RenderingType": "OpaqueForward",
   "ConstantProperties": [
     {
       "Name": "Tint",

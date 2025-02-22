@@ -72,8 +72,12 @@ namespace pulsar
         // fill texture
         if (m_isCreatedGpuResource)
         {
-            m_gfxTexture = Application::GetGfxApp()->CreateTexture2DFromMemory((uint8_t*)m_bitmap.data(), bitmapDataSize, m_width, m_height, gfx::GFXTextureFormat::R8G8B8A8_UNorm, {});
+            SamplerConfig cfg;
+            cfg.Filter = GetSamplerFilter();
+            cfg.AddressMode = GetSamplerAddressMode();
+            m_gfxTexture = Application::GetGfxApp()->CreateTexture2DFromMemory((uint8_t*)m_bitmap.data(), bitmapDataSize, m_width, m_height, gfx::GFXTextureFormat::R8G8B8A8_UNorm, cfg);
         }
+        RuntimeObjectManager::NotifyDependencySource(GetObjectHandle(), DependencyObjectState::Reload);
     }
 
     bool CurveLinearColorAtlas::CreateGPUResource()
@@ -109,15 +113,28 @@ namespace pulsar
         base::PostEditChange(info);
         if (info->GetName() == NAMEOF(m_colorCurveAssets))
         {
-            Generate();
+            RebuildDependencies();
+            // Generate();
         }
-        if (info->GetName() == NAMEOF(m_width))
+        Generate();
+    }
+
+    void CurveLinearColorAtlas::OnDependencyMessage(ObjectHandle inDependency, DependencyObjectState msg)
+    {
+        base::OnDependencyMessage(inDependency, msg);
+        if (msg == DependencyObjectState::Reload)
         {
             Generate();
         }
-        if (info->GetName() == NAMEOF(m_height))
+
+    }
+
+    void CurveLinearColorAtlas::GetDependencies(array_list<ObjectHandle>& out)
+    {
+        base::GetDependencies(out);
+        for (auto& curve : *m_colorCurveAssets)
         {
-            Generate();
+            out.push_back(curve.Handle);
         }
     }
 } // namespace pulsar

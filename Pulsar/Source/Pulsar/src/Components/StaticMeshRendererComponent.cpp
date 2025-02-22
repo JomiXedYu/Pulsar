@@ -154,6 +154,15 @@ namespace pulsar
         }
         return ro;
     }
+    void StaticMeshRendererComponent::GetDependencies(array_list<ObjectHandle>& out)
+    {
+        base::GetDependencies(out);
+        out.push_back(m_staticMesh.Handle);
+        for (auto& mat : *m_materials)
+        {
+            out.push_back(mat.Handle);
+        }
+    }
 
     void StaticMeshRendererComponent::PostEditChange(FieldInfo* info)
     {
@@ -193,15 +202,7 @@ namespace pulsar
 
     void StaticMeshRendererComponent::SetStaticMesh(RCPtr<StaticMesh> staticMesh)
     {
-        if (m_staticMesh)
-        {
-            RuntimeObjectManager::RemoveDependList(GetObjectHandle(), m_staticMesh.GetHandle());
-        }
         m_staticMesh = std::move(staticMesh);
-        if (m_staticMesh)
-        {
-            RuntimeObjectManager::AddDependList(GetObjectHandle(), m_staticMesh.GetHandle());
-        }
 
         OnMeshChanged();
     }
@@ -218,25 +219,7 @@ namespace pulsar
             return;
         }
 
-
-        if (m_beginning)
-        {
-            if (auto& mat = m_materials->at(index))
-            {
-                RuntimeObjectManager::RemoveDependList(GetObjectHandle(), mat.GetHandle());
-            }
-        }
-
         m_materials->at(index) = material;
-
-        if (m_beginning)
-        {
-            if (material)
-            {
-                RuntimeObjectManager::AddDependList(GetObjectHandle(), material.GetHandle());
-            }
-        }
-
 
         OnMaterialChanged();
     }
@@ -261,30 +244,16 @@ namespace pulsar
         GetWorld()->AddRenderObject(m_renderObject);
         ResizeMaterials(m_materials->size());
 
-        for (size_t i = 0; i < m_materials->GetCount(); ++i)
-        {
-            if (auto& mat = m_materials->at(i))
-            {
-                RuntimeObjectManager::AddDependList(GetObjectHandle(), mat.GetHandle());
-            }
-        }
         OnTransformChanged();
     }
     void StaticMeshRendererComponent::EndComponent()
     {
         base::EndComponent();
 
-        for (size_t i = 0; i < m_materials->GetCount(); ++i)
-        {
-            if (auto& mat = m_materials->at(i))
-            {
-                RuntimeObjectManager::RemoveDependList(GetObjectHandle(), mat.GetHandle());
-            }
-        }
-
         GetWorld()->RemoveRenderObject(m_renderObject);
         m_renderObject.reset();
     }
+
     // void StaticMeshRendererComponent::BeginListenMaterialStateChanged(size_t index)
     // {
     //     if (auto mat = m_materials->at(index))
@@ -341,19 +310,8 @@ namespace pulsar
     void StaticMeshRendererComponent::ResizeMaterials(size_t size)
     {
         m_materialsSize = size;
-
-        if (size < m_materials->size())
-        {
-            for (size_t i = size; i < m_materialsSize; ++i)
-            {
-                if (auto& mat = m_materials->at(i))
-                {
-                    RuntimeObjectManager::RemoveDependList(GetObjectHandle(), mat.GetHandle());
-                }
-            }
-        }
-
         m_materials->resize(size);
+        RebuildDependencies();
     }
 
     void StaticMeshRendererComponent::OnTransformChanged()
@@ -361,6 +319,7 @@ namespace pulsar
         base::OnTransformChanged();
         m_renderObject->SetTransform(GetNode()->GetTransform()->GetLocalToWorldMatrix());
     }
+
     void StaticMeshRendererComponent::OnMeshChanged()
     {
         if (m_staticMesh)
@@ -377,6 +336,7 @@ namespace pulsar
         {
             m_renderObject->SetStaticMesh(m_staticMesh)->SubmitChange();
         }
+        RebuildDependencies();
     }
     void StaticMeshRendererComponent::OnMaterialChanged()
     {
@@ -391,6 +351,7 @@ namespace pulsar
             }
             m_renderObject->SetMaterials(*m_materials)->SubmitChange();
         }
+        RebuildDependencies();
     }
 
 } // namespace pulsar

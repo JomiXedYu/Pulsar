@@ -268,6 +268,9 @@ namespace pulsared
             "Engine/Shaders/Lambert",
             "Engine/Shaders/Unlit",
             "Engine/Shaders/VertexColor",
+            "Engine/Shaders/Lit",
+            "Engine/Shaders/ImagePreview",
+            "Engine/Shaders/SkySphere",
         };
         if (PreCompileShaderPaths.empty())
         {

@@ -52,6 +52,10 @@ namespace pulsar
         auto shaderConfig = shader->GetConfig();
 
         // process deferred
+        if (shaderConfig->RenderingType == ShaderPassRenderingType::OpaqueDeferred)
+        {
+
+        }
         // create shader module from source
         gfx::GFXGpuProgram_sp gpuProgram = Application::GetGfxApp()->CreateGpuProgram(passes.Sources);
 
@@ -148,17 +152,34 @@ namespace pulsar
     {
         return m_createdGpuResource;
     }
+    void Material::GetDependencies(array_list<ObjectHandle>& out)
+    {
+        base::GetDependencies(out);
+        out.push_back(m_shader.Handle);
+        for (auto& val : m_parameterValues | std::views::values)
+        {
+            if (val.Type == ShaderParameterType::Texture)
+            {
+                out.push_back(val.AsTexture().Handle);
+            }
+        }
+
+    }
     void Material::OnDependencyMessage(ObjectHandle inDependency, DependencyObjectState msg)
     {
         base::OnDependencyMessage(inDependency, msg);
-        if (EnumHasFlag(msg, DependencyObjectState::Reload))
+        if (inDependency == m_shader.Handle)
         {
-            ActiveShader();
+            if (EnumHasFlag(msg, DependencyObjectState::Reload))
+            {
+                ActiveShader();
+            }
+            else if (EnumHasFlag(msg, DependencyObjectState::Unload))
+            {
+                InactiveShader();
+            }
         }
-        else if (EnumHasFlag(msg, DependencyObjectState::Unload))
-        {
-            InactiveShader();
-        }
+        SubmitParameters(true);
     }
     void Material::ActiveShader()
     {
@@ -253,6 +274,8 @@ namespace pulsar
             auto shaderObject = ObjectHandle::parse(s->Object->At("Shader")->AsString());
             auto shader = GetAssetManager()->LoadAssetById(shaderObject);
             SetShader(shader);
+
+            RuntimeObjectManager::RebuildDependencies(this);
         }
     }
 
@@ -281,6 +304,7 @@ namespace pulsar
     {
         m_parameterValues[name].SetValue(value);
         m_isDirtyParameter = true;
+        RuntimeObjectManager::RebuildDependencies(this);
     }
 
     void Material::SetVector4(const index_string& name, const Vector4f& value)
@@ -347,6 +371,10 @@ namespace pulsar
 
     void Material::SubmitParameters(bool force)
     {
+        if (!IsCreatedGPUResource())
+        {
+            return;
+        }
         if (m_submitShader != m_shader)
         {
             return;
@@ -449,16 +477,10 @@ namespace pulsar
     void Material::SetShader(RCPtr<Shader> value)
     {
         TryLoadAssetRCPtr(value);
-        if (m_shader)
-        {
-            RuntimeObjectManager::RemoveDependList(GetObjectHandle(), m_shader->GetObjectHandle());
-        }
 
         m_shader = std::move(value);
-        if (m_shader)
-        {
-            RuntimeObjectManager::AddDependList(GetObjectHandle(), m_shader->GetObjectHandle());
-        }
+
+        RuntimeObjectManager::RebuildDependencies(this);
 
         if (m_shader == nullptr || !m_shader->IsReady())
         {

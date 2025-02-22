@@ -2,7 +2,9 @@
 
 #include "ImCurveEdit.h"
 #include "ImGuiExt.h"
+#include "ImGradientHDR.h"
 #include "PropertyControls/PropertyControl.h"
+#include "imgui/imgui_internal.h"
 
 namespace pulsared
 {
@@ -28,6 +30,7 @@ namespace pulsared
         {
             BuildImData();
         }
+
         size_t GetCurveCount() override { return m_curve->GetCurveCount(); }
         ImVec2& GetMin() override { return m_min; }
         ImVec2& GetMax() override { return m_max; }
@@ -35,6 +38,7 @@ namespace pulsared
         {
             return m_curve->GetCurveData(curveIndex)->GetKeyCount();
         }
+
         uint32_t GetCurveColor(size_t curveIndex) override
         {
             return 0xFFFFFFFF;
@@ -59,6 +63,7 @@ namespace pulsared
         {
             return m_imData[curveIndex].data();
         }
+
         int EditPoint(size_t curveIndex, int pointIndex, ImVec2 value) override
         {
             auto key = m_curve->GetCurveData(curveIndex)->GetKey(pointIndex);
@@ -68,6 +73,7 @@ namespace pulsared
             BuildImData();
             return 0;
         }
+
         void AddPoint(size_t curveIndex, ImVec2 value) override
         {
             auto key = CurveKey{};
@@ -87,10 +93,45 @@ namespace pulsared
             return;
         }
 
-        auto edit = RampEdit { m_colorCurve.GetPtr() };
+        auto id = ImGui::GetID("cx");
+        ImGradientHDRState state;
 
-        auto id = ImGui::GetID("CurveEdit");
-        // ImCurveEdit::Edit(edit, ImVec2{500, 500}, id);
+        auto keyCount = m_colorCurve->GetCurveData(0)->GetKeyCount();
+        auto curveCount = m_colorCurve->GetCurveCount();
+
+        for (int i = 0; i < keyCount; ++i)
+        {
+            auto time = m_colorCurve->GetCurveData(0)->GetKey(i).Time;
+            std::array<float, 3> color;
+            color[0] = m_colorCurve->GetCurveData(0)->GetKey(i).Value;
+            color[1] = m_colorCurve->GetCurveData(1)->GetKey(i).Value;
+            color[2] = m_colorCurve->GetCurveData(2)->GetKey(i).Value;
+            state.AddColorMarker(time, color, 1);;
+        }
+
+        auto oldKeyCount = state.ColorCount;
+
+        if (ImGradientHDR(id,state, temporaryState))
+        {
+            auto newKeyCount = state.ColorCount;
+            for (int i = oldKeyCount; i < newKeyCount; ++i)
+            {
+                m_colorCurve->InsertColorKey();
+            }
+
+            for (int keyIndex = 0; keyIndex < state.ColorCount; ++keyIndex)
+            {
+                auto keys = m_colorCurve->GetColorsKey(keyIndex);
+                for (int colorChannelIndex = 0; colorChannelIndex < 3; ++colorChannelIndex)
+                {
+                    keys[colorChannelIndex].Time = state.Colors[keyIndex].Position;
+                    keys[colorChannelIndex].Value = state.Colors[keyIndex].Color[colorChannelIndex];
+                }
+                m_colorCurve->SetColorsKey(keyIndex, keys);
+
+            }
+            m_colorCurve->PostEditChange(nullptr);
+        }
 
         if (PImGui::PropertyGroup("Curve Color"))
         {
@@ -98,7 +139,6 @@ namespace pulsared
             PImGui::ObjectFieldProperties(type, type, m_colorCurve.GetPtr(), m_colorCurve.GetPtr(), false);
         }
 
-        // ramp
-        // curve editor
+
     }
 } // namespace pulsared

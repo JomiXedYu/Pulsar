@@ -1,4 +1,5 @@
 #pragma once
+#include "ImGradientHDR.h"
 #include "Pulsar/Assets/CurveLinearColor.h"
 #include "PulsarEd/Editors/CurveEditor/CurveEditorWindow.h"
 
@@ -18,5 +19,6 @@ namespace pulsared
 
     private:
         RCPtr<CurveLinearColor> m_colorCurve;
+        ImGradientHDRTemporaryState temporaryState{};
     };
 } // namespace pulsared
