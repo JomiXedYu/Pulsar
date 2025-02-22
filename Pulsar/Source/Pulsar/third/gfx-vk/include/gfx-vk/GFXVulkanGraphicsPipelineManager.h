@@ -12,7 +12,8 @@ namespace gfx
         virtual ~GFXVulkanGraphicsPipelineManager() override;
     public:
         virtual std::shared_ptr<GFXGraphicsPipeline> GetGraphicsPipeline(
-            const std::shared_ptr<GFXShaderPass>& shaderPass,
+            const array_list<GFXGpuProgram_sp>& gpuPrograms,
+            GFXGraphicsPipelineStateParams stateParams,
             const array_list<GFXDescriptorSetLayout_sp>& descriptorSetLayouts,
             const std::shared_ptr<GFXRenderPassLayout>& renderPass,
             const GFXGraphicsPipelineState& gpInfo) override;

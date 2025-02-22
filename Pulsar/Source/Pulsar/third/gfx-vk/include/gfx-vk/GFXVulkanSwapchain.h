@@ -8,20 +8,20 @@
 #include "GFXVulkanQueue.h"
 #include "GFXVulkanRenderPass.h"
 #include "GFXVulkanTexture.h"
-#include <gfx/GFXViewport.h>
 #include <gfx/GFXSurface.h>
+#include <gfx/GFXSwapchain.h>
 
 namespace gfx
 {
     class GFXVulkanApplication;
 
-    class GFXVulkanViewport : public GFXViewport
+    class GFXVulkanSwapchain : public GFXSwapchain
     {
 
     public:
 
-        GFXVulkanViewport(GFXVulkanApplication* app, GFXSurface* window);
-        virtual ~GFXVulkanViewport() override;
+        GFXVulkanSwapchain(GFXVulkanApplication* app, GFXSurface* window);
+        virtual ~GFXVulkanSwapchain() override;
 
         void InitSwapChain();
         void TermSwapChain();

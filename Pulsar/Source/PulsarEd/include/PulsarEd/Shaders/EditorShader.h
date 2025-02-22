@@ -11,7 +11,7 @@ namespace pulsared
     {
     public:
         static std::vector<char> CompileStageTargetPlatformByCode(
-            const char* shaderCode, gfx::GFXApi api, gfx::GFXShaderStageFlags stage,
+            const char* shaderCode, gfx::GFXApi api, gfx::GFXGpuProgramStageFlags stage,
             const std::vector<std::filesystem::path>& includes, const std::vector<string>& defines);
 
         static std::vector<psc::TargetShader> CompilePulsarShader(

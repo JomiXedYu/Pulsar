@@ -111,10 +111,10 @@ namespace pulsar
 
         gfx::GFXDescriptorSetLayoutInfo ppDescLayouts[2]{
             {gfx::GFXDescriptorType::CombinedImageSampler,
-             gfx::GFXShaderStageFlags::VertexFragment,
+             gfx::GFXGpuProgramStageFlags::VertexFragment,
              0, 2},
             {gfx::GFXDescriptorType::CombinedImageSampler,
-             gfx::GFXShaderStageFlags::VertexFragment,
+             gfx::GFXGpuProgramStageFlags::VertexFragment,
              1, 2},
         };
 

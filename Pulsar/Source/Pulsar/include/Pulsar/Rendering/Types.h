@@ -1,6 +1,6 @@
 #pragma once
 #include <Pulsar/ObjectBase.h>
-#include <gfx/GFXShaderPass.h>
+#include <gfx/GFXGraphicsPipeline.h>
 
 namespace pulsar
 {

@@ -1,7 +1,6 @@
-#include "GFXVulkanViewport.h"
 #include "BufferHelper.h"
 #include "GFXVulkanApplication.h"
-#include "GFXVulkanViewport.h"
+#include "GFXVulkanSwapchain.h"
 #include "PhysicalDeviceHelper.h"
 
 #include <SDL_vulkan.h>
@@ -99,7 +98,7 @@ namespace gfx
             }
         }
     }
-    GFXVulkanViewport::GFXVulkanViewport(GFXVulkanApplication* app, GFXSurface* window)
+    GFXVulkanSwapchain::GFXVulkanSwapchain(GFXVulkanApplication* app, GFXSurface* window)
         : m_app(app), m_window(window)
     {
         this->InitSwapChain();
@@ -133,7 +132,7 @@ namespace gfx
             m_queues.push_back(std::unique_ptr<GFXVulkanQueue>{new GFXVulkanQueue(m_app, m_imageAvailableSemaphores[i], m_renderFinishedSemaphores[i], m_inFlightFences[i])});
         }
     }
-    GFXVulkanViewport::~GFXVulkanViewport()
+    GFXVulkanSwapchain::~GFXVulkanSwapchain()
     {
         TermSwapChain();
 
@@ -152,7 +151,7 @@ namespace gfx
     }
 
 
-    void GFXVulkanViewport::InitSwapChain()
+    void GFXVulkanSwapchain::InitSwapChain()
     {
         SwapChainSupportDetails swapChainSupport = _QuerySwapChainSupport(m_app);
         VkSurfaceFormatKHR surfaceFormat = _ChooseSwapSurfaceFormat(swapChainSupport.formats);
@@ -294,7 +293,7 @@ namespace gfx
         }
     }
 
-    void GFXVulkanViewport::TermSwapChain()
+    void GFXVulkanSwapchain::TermSwapChain()
     {
         m_framebuffer.clear();
         m_swapRenderTarget.clear();
@@ -309,7 +308,7 @@ namespace gfx
         m_renderPass.reset();
     }
 
-    void GFXVulkanViewport::ReInitSwapChain()
+    void GFXVulkanSwapchain::ReInitSwapChain()
     {
         int width = 0, height = 0;
         // SDL_Vulkan_GetDrawableSize((SDL_Window*)m_app->GetWindow()->GetUserPoint(), &width, &height);
@@ -327,18 +326,18 @@ namespace gfx
         InitSwapChain();
     }
 
-    void GFXVulkanViewport::SetSize(int width, int height)
+    void GFXVulkanSwapchain::SetSize(int width, int height)
     {
         // glfwSetWindowSize(m_window, width, height);
 
     }
 
-    void GFXVulkanViewport::GetSize(int* width, int* height) const
+    void GFXVulkanSwapchain::GetSize(int* width, int* height) const
     {
         *width = m_swapChainExtent.width;
         *height = m_swapChainExtent.height;
     }
-    VkResult GFXVulkanViewport::AcquireNextImage(uint32_t* outIndex)
+    VkResult GFXVulkanSwapchain::AcquireNextImage(uint32_t* outIndex)
     {
         m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
         auto result = vkAcquireNextImageKHR(m_app->GetVkDevice(), GetVkSwapChain(), UINT64_MAX, m_imageAvailableSemaphores[m_currentFrame], VK_NULL_HANDLE, &m_imageIndex);
@@ -346,7 +345,7 @@ namespace gfx
         return result;
     }
 
-    GFXFrameBufferObject* gfx::GFXVulkanViewport::GetFrameBufferObject()
+    GFXFrameBufferObject* gfx::GFXVulkanSwapchain::GetFrameBufferObject()
     {
         return m_framebuffer[m_imageIndex].get();
     }

@@ -55,7 +55,7 @@ namespace pulsared
         : m_app(app)
     {
         gfx::GFXDescriptorSetLayoutInfo info{
-            gfx::GFXDescriptorSetLayoutInfo(gfx::GFXDescriptorType::CombinedImageSampler, gfx::GFXShaderStageFlags::Fragment, 0)};
+            gfx::GFXDescriptorSetLayoutInfo(gfx::GFXDescriptorType::CombinedImageSampler, gfx::GFXGpuProgramStageFlags::Fragment, 0)};
         m_descriptorLayout = m_app->CreateDescriptorSetLayout(&info, 1);
     }
 

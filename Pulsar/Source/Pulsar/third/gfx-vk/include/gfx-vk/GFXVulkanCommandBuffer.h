@@ -4,7 +4,6 @@
 #include "GFXVulkanFrameBufferObject.h"
 #include "GFXVulkanBuffer.h"
 #include "GFXVulkanDescriptorSet.h"
-#include "GFXVulkanShaderPass.h"
 #include <array>
 
 namespace gfx

@@ -10,10 +10,9 @@
 #include "GFXVulkanGraphicsPipelineManager.h"
 #include "GFXVulkanRenderPass.h"
 #include "GFXVulkanRenderer.h"
-#include "GFXVulkanShaderPass.h"
+#include "GFXVulkanSwapchain.h"
 #include "GFXVulkanTexture.h"
 #include "GFXVulkanVertexLayoutDescription.h"
-#include "GFXVulkanViewport.h"
 #include "PhysicalDeviceHelper.h"
 
 #include <SDL_vulkan.h>
@@ -400,7 +399,7 @@ namespace gfx
 
         m_descriptorManager = new GFXVulkanDescriptorManager(this);
 
-        m_viewport = new GFXVulkanViewport(this, m_window);
+        m_viewport = new GFXVulkanSwapchain(this, m_window);
 
         m_renderer = new GFXVulkanRenderer(this);
 
@@ -530,18 +529,9 @@ namespace gfx
         return gfxmksptr(buf);
     }
 
-    GFXGpuProgram_sp GFXVulkanApplication::CreateGpuProgram(const std::unordered_map<gfx::GFXShaderStageFlags, array_list<char>>& codes)
+    GFXGpuProgram_sp GFXVulkanApplication::CreateGpuProgram(GFXGpuProgramStageFlags stage, const uint8_t* code, size_t length)
     {
-        return gfxmksptr(new GFXVulkanGpuProgram(this, codes));
-    }
-
-    GFXShaderPass_sp GFXVulkanApplication::CreateShaderPass(
-        const GFXShaderPassConfig& config,
-        const GFXGpuProgram_sp& gpuProgram)
-    {
-        auto pass = new GFXVulkanShaderPass(this, config,
-                                            std::static_pointer_cast<GFXVulkanGpuProgram>(gpuProgram));
-        return gfxmksptr(pass);
+        return gfxmksptr(new GFXVulkanGpuProgram(this, stage, code, length));
     }
 
     GFXRenderPassLayout_sp GFXVulkanApplication::CreateRenderPassLayout(const std::vector<GFXTexture2DView*>& renderTargets)

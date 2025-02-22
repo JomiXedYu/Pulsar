@@ -56,23 +56,22 @@ namespace pulsar
         {
 
         }
-        // create shader module from source
-        gfx::GFXGpuProgram_sp gpuProgram = Application::GetGfxApp()->CreateGpuProgram(passes.Sources);
 
-        // create shader pass state config
-        gfx::GFXShaderPassConfig config{};
+        // create shader module from source
+        for (auto& [stage, code] : passes.Sources)
         {
-            config.CullMode = shaderConfig->CullMode;
-            config.DepthCompareOp = shaderConfig->DepthCompareOp;
-            config.DepthTestEnable = shaderConfig->DepthTestEnable;
-            config.DepthWriteEnable = shaderConfig->DepthWriteEnable;
-            config.StencilTestEnable = shaderConfig->StencilTestEnable;
+            auto program = Application::GetGfxApp()->CreateGpuProgram(stage, (const uint8_t*)code.data(), code.size());
+            m_gpuPrograms.push_back(program);
         }
 
-        // create shader pass
-        m_gfxShaderPasses = Application::GetGfxApp()->CreateShaderPass(
-            config,
-            gpuProgram);
+        // create shader pass state config
+        {
+            m_psoState.CullMode = shaderConfig->CullMode;
+            m_psoState.DepthCompareOp = shaderConfig->DepthCompareOp;
+            m_psoState.DepthTestEnable = shaderConfig->DepthTestEnable;
+            m_psoState.DepthWriteEnable = shaderConfig->DepthWriteEnable;
+            m_psoState.StencilTestEnable = shaderConfig->StencilTestEnable;
+        }
 
         // create constant layouts and constant buffer
         array_list<gfx::GFXDescriptorSetLayoutInfo> descLayoutInfos;
@@ -89,7 +88,7 @@ namespace pulsar
         {
             auto info = gfx::GFXDescriptorSetLayoutInfo{
                 gfx::GFXDescriptorType::ConstantBuffer,
-                gfx::GFXShaderStageFlags::VertexFragment,
+                gfx::GFXGpuProgramStageFlags::VertexFragment,
                 0, 4};
             descLayoutInfos.push_back(info);
         }
@@ -104,7 +103,7 @@ namespace pulsar
                 auto& item = shaderConfig->Properties->at(i);
                 auto info = gfx::GFXDescriptorSetLayoutInfo{
                     gfx::GFXDescriptorType::CombinedImageSampler,
-                    gfx::GFXShaderStageFlags::VertexFragment,
+                    gfx::GFXGpuProgramStageFlags::VertexFragment,
                     (uint32_t)i + offset, 4};
                 descLayoutInfos.push_back(info);
             }
@@ -143,7 +142,7 @@ namespace pulsar
             return;
         }
         m_createdGpuResource = false;
-        m_gfxShaderPasses.reset();
+        m_gpuPrograms.clear();
         m_descriptorSet.reset();
         m_descriptorSetLayout.reset();
         m_materialConstantBuffer.reset();
@@ -500,9 +499,5 @@ namespace pulsar
         OnShaderChanged.Invoke();
     }
 
-    gfx::GFXShaderPass_sp Material::GetGfxShaderPass()
-    {
-        return m_gfxShaderPasses;
-    }
 
 } // namespace pulsar

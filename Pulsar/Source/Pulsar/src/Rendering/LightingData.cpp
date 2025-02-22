@@ -16,7 +16,7 @@ namespace pulsar
         array_list<gfx::GFXDescriptorSetLayoutInfo> layoutInfo;
         {
             gfx::GFXDescriptorSetLayoutInfo info {
-                gfx::GFXDescriptorType::StructuredBuffer, gfx::GFXShaderStageFlags::VertexFragment, 0, 4
+                gfx::GFXDescriptorType::StructuredBuffer, gfx::GFXGpuProgramStageFlags::VertexFragment, 0, 4
             };
             layoutInfo.push_back(info);
         }

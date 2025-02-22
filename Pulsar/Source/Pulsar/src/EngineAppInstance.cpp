@@ -71,7 +71,9 @@ namespace pulsar
                 // batch render
                 for (auto& [state, batch] : batches)
                 {
-                    auto shaderPass = batch.Material->GetGfxShaderPass();
+                    auto gpuPrograms = batch.Material->GetGpuPrograms();
+                    auto psoParams = batch.Material->GetPSOParams();
+
                     auto renderingType = batch.Material->GetShader()->GetConfig()->RenderingType;
                     if (renderingType != ShaderPassRenderingType::OpaqueForward && renderingType != ShaderPassRenderingType::OpaqueDeferred)
                     {
@@ -93,7 +95,7 @@ namespace pulsar
                         descriptorSetLayouts.push_back(batch.Material->GetGfxDescriptorSetLayout());
                     }
 
-                    auto gfxPipeline = pipelineMgr->GetGraphicsPipeline(shaderPass, descriptorSetLayouts, targetFBO->GetRenderPassLayout(), batch.State);
+                    auto gfxPipeline = pipelineMgr->GetGraphicsPipeline(gpuPrograms, psoParams, descriptorSetLayouts, targetFBO->GetRenderPassLayout(), batch.State);
                     cmdBuffer.CmdBindGraphicsPipeline(gfxPipeline.get());
                     cmdBuffer.CmdSetCullMode(batch.GetCullMode());
 
@@ -202,12 +204,12 @@ namespace pulsar
                             gfx::GFXDescriptorSetLayoutInfo info[2] {
                                 {
                                     gfx::GFXDescriptorType::CombinedImageSampler,
-                                    gfx::GFXShaderStageFlags::VertexFragment,
+                                    gfx::GFXGpuProgramStageFlags::VertexFragment,
                                     0, 2
                                 },
                                 {
                                     gfx::GFXDescriptorType::CombinedImageSampler,
-                                    gfx::GFXShaderStageFlags::VertexFragment,
+                                    gfx::GFXGpuProgramStageFlags::VertexFragment,
                                     1, 2
                                 }
                             };
@@ -220,7 +222,8 @@ namespace pulsar
                     descriptorSetLayouts.push_back(ppMat->GetGfxDescriptorSetLayout());
 
                     auto pso = pipelineMgr->GetGraphicsPipeline(
-                        ppMat->GetGfxShaderPass(),
+                        ppMat->GetGpuPrograms(),
+                        ppMat->GetPSOParams(),
                         descriptorSetLayouts,
                         destRt->GetGfxFrameBufferObject()->GetRenderPassLayout(), {});
 

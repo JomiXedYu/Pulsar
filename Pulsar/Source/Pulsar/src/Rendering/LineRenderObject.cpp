@@ -47,7 +47,7 @@ namespace pulsar
         {
             gfx::GFXDescriptorSetLayoutInfo info{
                 gfx::GFXDescriptorType::ConstantBuffer,
-                gfx::GFXShaderStageFlags::VertexFragment,
+                gfx::GFXGpuProgramStageFlags::VertexFragment,
                 0, kRenderingDescriptorSpace_ModelInfo};
             m_meshDescriptorSetLayout = Application::GetGfxApp()->CreateDescriptorSetLayout(&info, 1);
             MeshDescriptorSetLayout = m_meshDescriptorSetLayout;

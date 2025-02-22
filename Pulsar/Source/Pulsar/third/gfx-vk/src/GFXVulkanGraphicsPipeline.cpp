@@ -1,7 +1,7 @@
 #include "GFXVulkanGraphicsPipeline.h"
 #include "GFXVulkanApplication.h"
 #include "GFXVulkanDescriptorSet.h"
-#include "GFXVulkanShaderPass.h"
+#include "GFXVulkanGpuProgram.h"
 #include "GFXVulkanVertexLayoutDescription.h"
 
 namespace gfx
@@ -10,32 +10,25 @@ namespace gfx
     {
         switch (topology)
         {
-        case gfx::GFXPrimitiveTopology::TriangleList:
+        case GFXPrimitiveTopology::TriangleList:
             return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-            break;
-        case gfx::GFXPrimitiveTopology::LineList:
+        case GFXPrimitiveTopology::LineList:
             return VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
-            break;
-        default:
-            assert(("not implement", false));
-            break;
         }
+        assert(("not implement", false));
         return {};
     }
+
     static VkPolygonMode _GetVkPolyMode(GFXPrimitiveTopology topology)
     {
         switch (topology)
         {
-        case gfx::GFXPrimitiveTopology::TriangleList:
+        case GFXPrimitiveTopology::TriangleList:
             return VK_POLYGON_MODE_FILL;
-            break;
-        case gfx::GFXPrimitiveTopology::LineList:
+        case GFXPrimitiveTopology::LineList:
             return VK_POLYGON_MODE_FILL;
-            break;
-        default:
-            assert(false);
-            break;
         }
+        assert(false);
         return {};
     }
 
@@ -75,14 +68,14 @@ namespace gfx
 
     GFXVulkanGraphicsPipeline::GFXVulkanGraphicsPipeline(
         GFXVulkanApplication* app,
-        const std::shared_ptr<GFXShaderPass>& shaderPass,
+        const array_list<GFXGpuProgram_sp>& gpuPrograms,
+        GFXGraphicsPipelineStateParams stateParams,
         const array_list<GFXDescriptorSetLayout_sp>& descriptorSetLayouts,
         const GFXRenderPassLayout& renderLayout,
         const GFXGraphicsPipelineState& gpInfo)
         : m_app(app)
     {
         // create pipeline layout
-        auto vkShaderPass = std::static_pointer_cast<GFXVulkanShaderPass>(shaderPass);
         auto& vkRenderpass = static_cast<const GFXVulkanRenderPass&>(renderLayout);
         array_list<VkDescriptorSetLayout> vkdescriptorSetLayouts;
         for (const auto& layout : descriptorSetLayouts)
@@ -128,13 +121,14 @@ namespace gfx
         inputAssembly.topology = _GetVkTopology(gpInfo.Topology);
         inputAssembly.primitiveRestartEnable = VK_FALSE;
 
+
         // make pipeline shader state
         VkPipelineRasterizationStateCreateInfo rasterizer{};
         rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         rasterizer.depthClampEnable = VK_FALSE;
         rasterizer.polygonMode = _GetVkPolyMode(gpInfo.Topology);
         rasterizer.lineWidth = gpInfo.LineWidth;
-        rasterizer.cullMode = static_cast<VkCullModeFlagBits>(vkShaderPass->GetStateConfig().CullMode);
+        rasterizer.cullMode = static_cast<VkCullModeFlagBits>(stateParams.CullMode);
         rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizer.depthBiasEnable = VK_FALSE;
         rasterizer.rasterizerDiscardEnable = VK_FALSE;
@@ -161,13 +155,13 @@ namespace gfx
 
         VkPipelineDepthStencilStateCreateInfo depthStencil{};
         depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-        depthStencil.depthTestEnable = vkShaderPass->GetStateConfig().DepthTestEnable;
-        depthStencil.depthWriteEnable = vkShaderPass->GetStateConfig().DepthWriteEnable;
-        depthStencil.depthCompareOp = _GetCampareOp(vkShaderPass->GetStateConfig().DepthCompareOp);
+        depthStencil.depthTestEnable = stateParams.DepthTestEnable;
+        depthStencil.depthWriteEnable = stateParams.DepthWriteEnable;
+        depthStencil.depthCompareOp = _GetCampareOp(stateParams.DepthCompareOp);
         depthStencil.depthBoundsTestEnable = VK_FALSE;
         depthStencil.minDepthBounds = 0.0f; // Optional
         depthStencil.maxDepthBounds = 1.0f; // Optional
-        depthStencil.stencilTestEnable = vkShaderPass->GetStateConfig().StencilTestEnable;
+        depthStencil.stencilTestEnable = stateParams.StencilTestEnable;
         depthStencil.front = {}; // Optional
         depthStencil.back = {};  // Optional
 
@@ -195,8 +189,18 @@ namespace gfx
 
         VkGraphicsPipelineCreateInfo pipelineInfo{};
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-        pipelineInfo.stageCount = vkShaderPass->GetVkStages().size();
-        pipelineInfo.pStages = vkShaderPass->GetVkStages().data();
+
+        VkPipelineShaderStageCreateInfo shaderStage[6];
+        int shaderStageCount = 0;
+        for (auto& gpuProgram : gpuPrograms)
+        {
+            auto vkGpuProgram = static_cast<GFXVulkanGpuProgram*>(gpuProgram.get());
+            shaderStage[shaderStageCount] = vkGpuProgram->GetCreateInfo();
+            shaderStageCount++;
+        }
+        pipelineInfo.stageCount = shaderStageCount;
+        pipelineInfo.pStages = shaderStage;
+
         pipelineInfo.pVertexInputState = &vertexInputInfo;
         pipelineInfo.pInputAssemblyState = &inputAssembly;
         pipelineInfo.pViewportState = &viewportState;

@@ -1,8 +1,6 @@
 #include "GFXVulkanCommandBuffer.h"
-#include "GFXVulkanCommandBuffer.h"
 #include "GFXVulkanApplication.h"
 #include "GFXVulkanCommandBufferPool.h"
-#include "GFXVulkanShaderPass.h"
 #include "GFXVulkanGraphicsPipeline.h"
 
 namespace gfx

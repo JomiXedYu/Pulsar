@@ -316,7 +316,7 @@ namespace pulsar
 
         gfx::GFXDescriptorSetLayoutInfo info{
             gfx::GFXDescriptorType::ConstantBuffer,
-            gfx::GFXShaderStageFlags::VertexFragment,
+            gfx::GFXGpuProgramStageFlags::VertexFragment,
             0, kRenderingDescriptorSpace_World};
 
         m_worldDescriptorLayout = Application::GetGfxApp()->CreateDescriptorSetLayout(&info, 1);

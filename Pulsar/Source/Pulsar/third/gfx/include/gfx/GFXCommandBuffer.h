@@ -3,7 +3,6 @@
 #include "GFXFrameBufferObject.h"
 #include "GFXGraphicsPipeline.h"
 #include "GFXInclude.h"
-#include "GFXShaderPass.h"
 #include "GFXTextureView.h"
 #include <memory>
 

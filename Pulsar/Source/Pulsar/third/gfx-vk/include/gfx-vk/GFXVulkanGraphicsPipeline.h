@@ -1,8 +1,9 @@
 #pragma once
-#include <gfx/GFXGraphicsPipeline.h>
-#include <gfx/GFXShaderPass.h>
-#include <gfx/GFXRenderPass.h>
 #include "VulkanInclude.h"
+#include "gfx/GFXDescriptorSet.h"
+#include "gfx/GFXGpuProgram.h"
+#include <gfx/GFXGraphicsPipeline.h>
+#include <gfx/GFXRenderPass.h>
 
 namespace gfx
 {
@@ -14,7 +15,8 @@ namespace gfx
     public:
         GFXVulkanGraphicsPipeline(
             GFXVulkanApplication* app,
-            const std::shared_ptr<GFXShaderPass>& shaderPass,
+            const array_list<GFXGpuProgram_sp>& gpuPrograms,
+            GFXGraphicsPipelineStateParams stateParams,
             const array_list<GFXDescriptorSetLayout_sp>& descriptorSetLayouts,
             const GFXRenderPassLayout& renderLayout,
             const GFXGraphicsPipelineState& gpInfo);

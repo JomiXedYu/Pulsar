@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gfx/GFXDescriptorSet.h>
+
 #include <Pulsar/AssetObject.h>
 #include <Pulsar/Assets/Shader.h>
 #include <Pulsar/Assets/Texture.h>
@@ -65,7 +67,8 @@ namespace pulsar
         {
             return m_descriptorSetLayout;
         }
-        gfx::GFXShaderPass_sp GetGfxShaderPass();
+        const auto& GetGpuPrograms() const { return m_gpuPrograms; }
+        const auto& GetPSOParams() const { return m_psoState; }
     public:
         RCPtr<Shader> GetShader() const;
         void SetShader(RCPtr<Shader> value);
@@ -82,7 +85,8 @@ namespace pulsar
 
         RCPtr<Shader> m_submitShader;
 
-        gfx::GFXShaderPass_sp m_gfxShaderPasses;
+        array_list<gfx::GFXGpuProgram_sp> m_gpuPrograms;
+        gfx::GFXGraphicsPipelineStateParams m_psoState;
 
         std::vector<uint8_t> m_bufferData;
 

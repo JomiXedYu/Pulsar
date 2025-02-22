@@ -27,32 +27,32 @@ namespace pulsared
 
         throw NotImplementException();
     }
-    static psc::FilePartialType _GetStage(gfx::GFXShaderStageFlags stage)
+    static psc::FilePartialType _GetStage(gfx::GFXGpuProgramStageFlags stage)
     {
         switch (stage)
         {
-        case gfx::GFXShaderStageFlags::Vertex:
+        case gfx::GFXGpuProgramStageFlags::Vertex:
             return psc::FilePartialType::Vert;
             break;
-        case gfx::GFXShaderStageFlags::Fragment:
+        case gfx::GFXGpuProgramStageFlags::Fragment:
             return psc::FilePartialType::Pixel;
             break;
-        case gfx::GFXShaderStageFlags::VertexFragment:
+        case gfx::GFXGpuProgramStageFlags::VertexFragment:
             break;
         default:
             break;
         }
         throw NotImplementException();
     }
-    static gfx::GFXShaderStageFlags _GetGFXStage(psc::FilePartialType type)
+    static gfx::GFXGpuProgramStageFlags _GetGFXStage(psc::FilePartialType type)
     {
         switch (type)
         {
         case psc::FilePartialType::Vert:
-            return gfx::GFXShaderStageFlags::Vertex;
+            return gfx::GFXGpuProgramStageFlags::Vertex;
             break;
         case psc::FilePartialType::Pixel:
-            return gfx::GFXShaderStageFlags::Fragment;
+            return gfx::GFXGpuProgramStageFlags::Fragment;
             break;
         case psc::FilePartialType::Compute:
             break;
@@ -72,7 +72,7 @@ namespace pulsared
 
 
     std::vector<char> ShaderCompiler::CompileStageTargetPlatformByCode(
-        const char* shaderCode, gfx::GFXApi api, gfx::GFXShaderStageFlags stage,
+        const char* shaderCode, gfx::GFXApi api, gfx::GFXGpuProgramStageFlags stage,
         const std::vector<std::filesystem::path>& includes, const std::vector<string>& defines)
     {
         auto pscApi = _GetApiType(api);

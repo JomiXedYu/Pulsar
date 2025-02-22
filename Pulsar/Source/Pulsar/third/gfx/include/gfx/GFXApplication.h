@@ -11,10 +11,9 @@
 #include "GFXRenderPass.h"
 #include "GFXRenderPipeline.h"
 #include "GFXRenderer.h"
-#include "GFXShaderPass.h"
+#include "GFXSwapchain.h"
 #include "GFXTextureView.h"
 #include "GFXVertexLayoutDescription.h"
-#include "GFXViewport.h"
 #include <functional>
 
 namespace gfx
@@ -68,10 +67,7 @@ namespace gfx
         virtual GFXBuffer_sp CreateBuffer(GFXBufferUsage usage, size_t bufferSize) = 0;
         virtual GFXCommandBuffer_sp CreateCommandBuffer() = 0;
         virtual GFXVertexLayoutDescription_sp CreateVertexLayoutDescription() = 0;
-        virtual GFXGpuProgram_sp CreateGpuProgram(const std::unordered_map<gfx::GFXShaderStageFlags, array_list<char>>& codes) = 0;
-        virtual GFXShaderPass_sp CreateShaderPass(
-            const GFXShaderPassConfig& config,
-            const GFXGpuProgram_sp& gpuProgram) = 0;
+        virtual GFXGpuProgram_sp CreateGpuProgram(GFXGpuProgramStageFlags stage, const uint8_t* code, size_t length) = 0;
 
         virtual GFXDescriptorManager* GetDescriptorManager() = 0;
 
@@ -107,7 +103,7 @@ namespace gfx
 
         virtual intptr_t GetWindowHandle() = 0;
 
-        virtual GFXViewport* GetViewport() = 0;
+        virtual GFXSwapchain* GetViewport() = 0;
 
     protected:
         GFXApplication() = default;

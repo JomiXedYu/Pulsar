@@ -10,7 +10,7 @@
 
 #include "GFXVulkanCommandBuffer.h"
 #include "GFXVulkanRenderPass.h"
-#include "GFXVulkanViewport.h"
+#include "GFXVulkanSwapchain.h"
 #include "gfx/GFXTextureView.h"
 #include <chrono>
 
@@ -42,10 +42,8 @@ namespace gfx
         virtual GFXBuffer_sp CreateBuffer(GFXBufferUsage usage, size_t bufferSize) override;
         virtual GFXCommandBuffer_sp CreateCommandBuffer() override;
         virtual GFXVertexLayoutDescription_sp CreateVertexLayoutDescription() override;
-        virtual GFXGpuProgram_sp CreateGpuProgram(const std::unordered_map<gfx::GFXShaderStageFlags, array_list<char>>& codes) override;
-        virtual GFXShaderPass_sp CreateShaderPass(
-            const GFXShaderPassConfig& config,
-            const GFXGpuProgram_sp& gpuProgram) override;
+        virtual GFXGpuProgram_sp CreateGpuProgram(GFXGpuProgramStageFlags stage, const uint8_t* code, size_t length) override;
+
 
         virtual GFXGraphicsPipelineManager* GetGraphicsPipelineManager() const override
         {
@@ -94,8 +92,8 @@ namespace gfx
         const VkQueue& GetVkPresentQueue() const { return m_presentQueue; }
         //const VkCommandPool& GetVkCommandPool() const { return m_commandPool; }
 
-        virtual GFXViewport* GetViewport() override { return m_viewport; }
-        GFXVulkanViewport* GetVulkanViewport() { return m_viewport; }
+        virtual GFXSwapchain* GetViewport() override { return m_viewport; }
+        GFXVulkanSwapchain* GetVulkanViewport() { return m_viewport; }
 
         virtual void SetRenderPipeline(GFXRenderPipeline* pipeline) override
         {
@@ -132,7 +130,7 @@ namespace gfx
         VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
         VkDevice m_device = VK_NULL_HANDLE;
 
-        GFXVulkanViewport* m_viewport = nullptr;
+        GFXVulkanSwapchain* m_viewport = nullptr;
 
         GFXRenderPipeline* m_renderPipeline = nullptr;
 

@@ -42,14 +42,14 @@ namespace gfx
         }
         return {};
     }
-    static VkShaderStageFlagBits _GetShaderStage(GFXShaderStageFlags flags)
+    static VkShaderStageFlagBits _GetShaderStage(GFXGpuProgramStageFlags flags)
     {
         std::underlying_type_t<VkShaderStageFlagBits> stage{};
-        if (HasFlag(flags, GFXShaderStageFlags::Vertex))
+        if (HasFlag(flags, GFXGpuProgramStageFlags::Vertex))
         {
             stage |= VK_SHADER_STAGE_VERTEX_BIT;
         }
-        if (HasFlag(flags, GFXShaderStageFlags::Fragment))
+        if (HasFlag(flags, GFXGpuProgramStageFlags::Fragment))
         {
             stage |= VK_SHADER_STAGE_FRAGMENT_BIT;
         }

@@ -3,6 +3,8 @@
 #include "Pulsar/BuiltinAsset.h"
 
 #include "Pulsar/MaterialParameterValue.h"
+#include "gfx/GFXGpuProgram.h"
+
 #include <Pulsar/AssetObject.h>
 #include <Pulsar/Assets/Texture.h>
 #include <Pulsar/IGPUResource.h>
@@ -10,7 +12,6 @@
 #include <Pulsar/Rendering/Types.h>
 #include <functional>
 #include <gfx/GFXApi.h>
-#include <gfx/GFXShaderPass.h>
 #include <mutex>
 
 namespace pulsar
@@ -20,7 +21,7 @@ namespace pulsar
         struct ApiPlatform
         {
             string Config;
-            hash_map<gfx::GFXShaderStageFlags, array_list<char>> Sources;
+            hash_map<gfx::GFXGpuProgramStageFlags, array_list<char>> Sources;
         };
         hash_map<gfx::GFXApi, ApiPlatform> ApiMaps;
     };

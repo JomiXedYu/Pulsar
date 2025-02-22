@@ -2,6 +2,7 @@
 #include "GFXBuffer.h"
 #include "GFXTexture.h"
 #include "GFXInclude.h"
+#include "GFXGpuProgram.h"
 #include <string_view>
 
 namespace gfx
@@ -13,34 +14,18 @@ namespace gfx
         CombinedImageSampler,
         Texture2D
     };
-    enum class GFXShaderStageFlags : uint32_t
-    {
-        Vertex = 1,
-        Fragment = 1 << 1,
-        Compute = 1 << 2,
-        VertexFragment = Vertex | Fragment,
-    };
-    inline const char* to_string(GFXShaderStageFlags stage)
-    {
-        switch (stage)
-        {
-        case GFXShaderStageFlags::Vertex: return "Vertex";
-        case GFXShaderStageFlags::Fragment: return "Fragment";
-        case GFXShaderStageFlags::VertexFragment: return "VertexFragment";
-        }
-        return nullptr;
-    }
+
 
     struct GFXDescriptorSetLayoutInfo final
     {
     public:
         uint32_t BindingPoint;
         GFXDescriptorType Type;
-        GFXShaderStageFlags Stage;
+        GFXGpuProgramStageFlags Stage;
 
         GFXDescriptorSetLayoutInfo(
             GFXDescriptorType type,
-            GFXShaderStageFlags stage,
+            GFXGpuProgramStageFlags stage,
             uint32_t bindingPoint = 0,
             uint32_t spacePoint = 0)
             : Type(type), Stage(stage), BindingPoint(bindingPoint)
