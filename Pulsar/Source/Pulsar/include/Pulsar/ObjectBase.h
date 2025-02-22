@@ -86,9 +86,12 @@ namespace pulsar
 
         virtual void OnDependencyMessage(ObjectHandle inDependency, DependencyObjectState msg);
 
+        virtual void GetDependencies(array_list<ObjectHandle>& out) {}
+        void RebuildDependencies();
     protected:
         virtual void OnConstruct();
         virtual void OnDestroy();
+
     protected:
         void SendOuterDependencyMsg(DependencyObjectState msg) const;
     private:
@@ -153,12 +156,14 @@ namespace pulsar
         static Action<ObjectHandle, Type*, bool> ObjectHook;
         static Action<ObjectBase*> OnPostEditChanged;
 
-        static void AddDependList(ObjectHandle src, ObjectHandle dest);
-        static void RemoveDependList(ObjectHandle src, ObjectHandle dest);
-        static void NotifyDependObjects(ObjectHandle dest, DependencyObjectState id);
+        static void NotifyDependencySource(ObjectHandle dest, DependencyObjectState id);
+        static void RebuildDependencies(ObjectBase* obj);
     };
 
-
+    class InlineObjectAttribute : public Attribute
+    {
+        CORELIB_DEF_TYPE(AssemblyObject_pulsar, pulsar::InlineObjectAttribute, Attribute);
+    };
 
     struct ObjectPtrBase
     {
@@ -200,9 +205,9 @@ namespace pulsar
         }
     };
 
-    class BoxingObjectPtrBase : public BoxingObject, public IStringify
+    class BoxingObjectPtrBase : public PointerBoxingObject, public IStringify
     {
-        CORELIB_DEF_TYPE(AssemblyObject_pulsar, pulsar::BoxingObjectPtrBase, BoxingObject);
+        CORELIB_DEF_TYPE(AssemblyObject_pulsar, pulsar::BoxingObjectPtrBase, PointerBoxingObject);
         CORELIB_IMPL_INTERFACES(IStringify)
     public:
         using unboxing_type = ObjectPtrBase;
@@ -210,6 +215,8 @@ namespace pulsar
         BoxingObjectPtrBase() : CORELIB_INIT_INTERFACE(IStringify) {}
         explicit BoxingObjectPtrBase(const ObjectPtrBase& invalue) : ptr(invalue),
             CORELIB_INIT_INTERFACE(IStringify) {}
+
+        Object* GetPointer() const override { return ptr.GetObjectPointer(); }
 
         void IStringify_Parse(const string& value) override
         {
@@ -494,9 +501,9 @@ namespace pulsar
         return ptr_cast<T>(o.GetPtr());
     }
 
-    class BoxingRCPtrBase : public BoxingObject, public IStringify
+    class BoxingRCPtrBase : public PointerBoxingObject, public IStringify
     {
-        CORELIB_DEF_TYPE(AssemblyObject_pulsar, pulsar::BoxingRCPtrBase, BoxingObject);
+        CORELIB_DEF_TYPE(AssemblyObject_pulsar, pulsar::BoxingRCPtrBase, PointerBoxingObject);
         CORELIB_IMPL_INTERFACES(IStringify)
     public:
         using unboxing_type = RCPtrBase;
@@ -504,6 +511,8 @@ namespace pulsar
         BoxingRCPtrBase() : CORELIB_INIT_INTERFACE(IStringify), ptr({}) {}
         explicit BoxingRCPtrBase(const RCPtrBase& invalue) :
             CORELIB_INIT_INTERFACE(IStringify), ptr(invalue) {}
+
+        Object* GetPointer() const override { return ptr.GetPointer(); }
 
         void IStringify_Parse(const string& value) override
         {

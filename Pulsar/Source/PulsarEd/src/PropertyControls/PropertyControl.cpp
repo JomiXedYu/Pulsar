@@ -174,7 +174,7 @@ namespace pulsared
             if (opened)
             {
                 const auto fieldInfos = innerType->GetFieldInfos(TypeBinding::NonPublic);
-                for (size_t i = 0; i < fieldInfos.size(); ++i)
+                for (int i = 0; i < fieldInfos.size(); ++i)
                 {
                     const auto& field = fieldInfos[i];
                     Type* fieldType = field->GetFieldType();
@@ -187,27 +187,15 @@ namespace pulsared
                         continue;
                     }
 
-                    ImGui::PushID((int)i);
-                    Object_sp fieldInstSptr;
+                    ImGui::PushID(i);
+
                     Object* parentObj = obj;
-                    if (type == BoxingObjectPtrBase::StaticType())
+                    if (type->IsSubclassOf(cltypeof<PointerBoxingObject>()))
                     {
-                        const auto objptr = dynamic_cast<BoxingObjectPtrBase*>(obj);
-                        if (objptr->GetHandle())
-                        {
-                            parentObj = objptr->get_unboxing_value().GetObjectPointer();
-                            fieldInstSptr = field->GetValue(parentObj);
-                        }
-                        else
-                        {
-                            // fieldInstSptr = mkbox(ObjectPtrBase{});
-                            fieldInstSptr = obj->shared_from_this();
-                        }
+                        auto pointer = dynamic_cast<PointerBoxingObject*>(obj);
+                        parentObj = pointer->GetPointer();
                     }
-                    else
-                    {
-                        fieldInstSptr = field->GetValue(obj);
-                    }
+                    Object_sp fieldInstSptr = field->GetValue(parentObj);
 
                     Type* fieldInnerType = field->GetWrapType() ? field->GetWrapType() : field->GetFieldType();
                     if (const auto attr = field->GetAttribute<ListItemAttribute>())

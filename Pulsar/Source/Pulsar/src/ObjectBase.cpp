@@ -310,20 +310,13 @@ namespace pulsar
         static hash_map<ObjectHandle, array_list<ObjectHandle>> map;
         return map;
     }
+    static auto& _refs()
+    {
+        static hash_map<ObjectHandle, array_list<ObjectHandle>> map;
+        return map;
+    }
 
-    void RuntimeObjectManager::AddDependList(ObjectHandle src, ObjectHandle dest)
-    {
-        _depends()[dest].emplace_back(src);
-    }
-    void RuntimeObjectManager::RemoveDependList(ObjectHandle src, ObjectHandle dest)
-    {
-        std::erase(_depends()[dest], src);
-        if (_depends()[dest].empty())
-        {
-            _depends().erase(dest);
-        }
-    }
-    void RuntimeObjectManager::NotifyDependObjects(ObjectHandle dest, DependencyObjectState id)
+    void RuntimeObjectManager::NotifyDependencySource(ObjectHandle dest, DependencyObjectState id)
     {
         auto it = _depends().find(dest);
         if (it != _depends().end())
@@ -336,7 +329,29 @@ namespace pulsar
                 }
             }
         }
+    }
 
+    void RuntimeObjectManager::RebuildDependencies(ObjectBase* obj)
+    {
+        auto& deps = _depends();
+        auto& refs = _refs();
+
+        auto sourceHandle = obj->GetObjectHandle();
+
+        for (auto& ref : refs[sourceHandle])
+        {
+            erase(deps[ref], sourceHandle);
+        }
+        refs.clear();
+
+        array_list<ObjectHandle> dependencies;
+        obj->GetDependencies(dependencies);
+
+        refs[sourceHandle] = dependencies;
+        for (auto& dependency : dependencies)
+        {
+            deps[dependency].push_back(sourceHandle);
+        }
     }
 
     ObjectBase::ObjectBase()
@@ -365,9 +380,12 @@ namespace pulsar
 
     void ObjectBase::OnDependencyMessage(ObjectHandle inDependency, DependencyObjectState msg)
     {
-
     }
 
+    void ObjectBase::RebuildDependencies()
+    {
+        RuntimeObjectManager::RebuildDependencies(this);
+    }
     void ObjectBase::OnConstruct()
     {
     }
@@ -392,7 +410,7 @@ namespace pulsar
     }
     void ObjectBase::SendOuterDependencyMsg(DependencyObjectState msg) const
     {
-        RuntimeObjectManager::NotifyDependObjects(GetObjectHandle(), msg);
+        RuntimeObjectManager::NotifyDependencySource(GetObjectHandle(), msg);
     }
 
     std::iostream& ReadWriteStream(std::iostream& stream, bool isWrite, ObjectPtrBase& obj)
