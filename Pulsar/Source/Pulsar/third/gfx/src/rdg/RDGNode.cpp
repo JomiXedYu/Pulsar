@@ -1,9 +1,9 @@
-#include "rdg/Node.h"
+#include "rdg/RDGNode.h"
 
 namespace rdg
 {
 
-    void Node::Initialize(Graph* graph, NodeId id)
+    void RDGNode::Initialize(RDGGraph* graph, NodeId id)
     {
         m_graph = graph;
         m_nodeId = id;

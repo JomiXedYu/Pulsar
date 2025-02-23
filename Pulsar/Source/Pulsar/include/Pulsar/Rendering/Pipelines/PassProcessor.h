@@ -2,10 +2,10 @@
 
 namespace pulsar
 {
-    class Pass
+    class PassProcessor
     {
     public:
 
-        virtual ~Pass() {}
+        virtual ~PassProcessor() {}
     };
 } // namespace pulsar

@@ -1,9 +1,9 @@
 #pragma once
-#include "Pass.h"
+#include "PassProcessor.h"
 
 namespace pulsar
 {
-    class PostProcessingPass : public Pass
+    class PostProcessingPass : public PassProcessor
     {
     };
 } // namespace pulsar

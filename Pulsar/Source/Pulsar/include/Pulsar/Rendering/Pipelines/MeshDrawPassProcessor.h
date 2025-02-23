@@ -1,5 +1,5 @@
 #pragma once
-#include "Pass.h"
+#include "PassProcessor.h"
 
 namespace pulsar
 {
@@ -7,7 +7,7 @@ namespace pulsar
     {
 
     };
-    class MeshDrawPass : public Pass
+    class MeshDrawPassProcessor : public PassProcessor
     {
     public:
         virtual void Draw(const MeshDrawPassParams& params) {}

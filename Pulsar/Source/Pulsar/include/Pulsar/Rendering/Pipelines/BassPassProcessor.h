@@ -1,13 +1,12 @@
 #pragma once
-#include "MeshDrawPass.h"
+#include "MeshDrawPassProcessor.h"
 
 namespace pulsar
 {
-    class ShadowPass : public MeshDrawPass
+    class BassPassProcessor : public MeshDrawPassProcessor
     {
-        using base = MeshDrawPass;
+        using base = MeshDrawPassProcessor;
     public:
         void Draw(const MeshDrawPassParams& params) override;
-
     };
 } // namespace pulsar
